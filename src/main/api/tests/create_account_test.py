@@ -1,9 +1,9 @@
-from src.main.api.db.crud.account_crud import AccountCrudDb as Account, AccountCrudDb
+from src.main.api.db.crud.account_crud import AccountCrudDb
 
 
 class TestCreateAccount:
     def test_create_account(self, api_manager, create_user, db_session):
-        response = api_manager.user_steps.create_bank_account(create_user)
+        response = api_manager.user_steps.create_bank_account(create_user.user_request)
         assert 0 == response.balance
 
         account_from_db = AccountCrudDb.get_account_by_id(db_session, response.id)

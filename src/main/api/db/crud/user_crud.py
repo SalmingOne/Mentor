@@ -21,7 +21,7 @@ class UserCrudDb:
         return user
 
     @staticmethod
-    def delete_user(self, db: Session, user_id: int) -> None:
+    def delete_user(db: Session, user_id: int) -> None:
         user = db.query(User).filter_by(id=user_id).first()
         if user:
             db.delete(user)

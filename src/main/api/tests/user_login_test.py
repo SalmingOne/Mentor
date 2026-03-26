@@ -14,9 +14,9 @@ class TestUserLogin:
         assert response.user.role == 'ROLE_ADMIN'
 
     def test_user_login(self, api_manager, create_user):
-        login_user_response = api_manager.admin_steps.login_user(create_user)
+        login_user_response = api_manager.admin_steps.login_user(create_user.user_request)
 
-        assert create_user.username == login_user_response.user.username
+        assert create_user.user_request.username == login_user_response.user.username
         assert login_user_response.user.role == 'ROLE_USER'
 
 

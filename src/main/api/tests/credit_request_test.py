@@ -14,19 +14,18 @@ class TestCreditRequest:
         return dict(role='ROLE_CREDIT_SECRET')
 
     def test_credit_request(self, api_manager, request_credit_request, db_session):
-        request_credit_request_, (create_user_request, _) = request_credit_request
-        response = api_manager.user_steps.request_credit(create_user_request, request_credit_request_)
+        response = api_manager.user_steps.request_credit(request_credit_request.user_request, request_credit_request.credit_request)
 
-        assert request_credit_request_.term_months == response.term_months
-        assert request_credit_request_.amount == response.balance
+        assert request_credit_request.credit_request.term_months == response.term_months
+        assert request_credit_request.credit_request.amount == response.balance
 
         credit_from_db = Credit.get_credit_by_id(db_session, credit_id=response.credit_id)
         assert credit_from_db.amount == response.balance
         assert credit_from_db.term_months == response.term_months
 
         transaction = Transaction.get_transaction_by_type(db_session, 'credit_issuance')
-        assert request_credit_request_.account_id == transaction.to_account_id
-        assert request_credit_request_.amount == transaction.amount
+        assert request_credit_request.credit_request.account_id == transaction.to_account_id
+        assert request_credit_request.credit_request.amount == transaction.amount
 
 
 
@@ -40,10 +39,9 @@ class TestCreditRequest:
         ({'account_id': random.randint(1, 5000)}, ResponseSpecs.request_not_found()),
     ], indirect=['request_credit_request'])
     def test_credit_request_invalid(self, api_manager, request_credit_request, response_spec, db_session):
-        request_credit_request_, (create_user_request, create_account_response) = request_credit_request
 
         transaction_before = Transaction.get_transaction_by_type(db_session, 'credit_issuance')
-        api_manager.user_steps.request_credit_bad(create_user_request, request_credit_request_, response_spec=response_spec)
+        api_manager.user_steps.request_credit_bad(request_credit_request.user_request, request_credit_request.credit_request, response_spec=response_spec)
 
         transaction_after = Transaction.get_transaction_by_type(db_session, 'credit_issuance')
         assert transaction_before == transaction_after
