@@ -7,6 +7,7 @@ class TestCreateAccount:
         assert 0 == response.balance
 
         account_from_db = AccountCrudDb.get_account_by_id(db_session, response.id)
+        assert account_from_db.id == response.id
 
 
 
