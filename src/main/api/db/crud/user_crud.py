@@ -13,7 +13,7 @@ class UserCrudDb:
         return db.query(User).filter_by(id=user_id).first()
 
     @staticmethod
-    def create_user(db: Session, username, password, role):
+    def create_user(db: Session, username: str, password: str, role: str) -> User:
         user = User(username=username, password=password, role=role)
         db.add(user)
         db.commit()

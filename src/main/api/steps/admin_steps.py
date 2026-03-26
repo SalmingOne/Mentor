@@ -1,6 +1,7 @@
 from src.main.api.foundation.endpoint import Endpoint
 from src.main.api.foundation.requesters.crud_requester import CrudRequester
 from src.main.api.foundation.requesters.validate_crud_requester import ValidateCrudRequester
+from src.main.api.models.base_model import BaseModel
 from src.main.api.models.create_user_request import CreateUserRequest
 from src.main.api.models.login_user_request import LoginUserRequest
 from src.main.api.specs.request_specs import RequestSpecs
@@ -10,7 +11,7 @@ from src.main.api.steps.base_steps import BaseSteps
 
 class AdminSteps(BaseSteps):
 
-    def create_user(self, create_user_request: CreateUserRequest):
+    def create_user(self, create_user_request: CreateUserRequest) -> BaseModel:
         response = ValidateCrudRequester(
             request_spec=RequestSpecs.auth_headers(username='admin', password='123456'),
             response_spec=ResponseSpecs.request_ok(),
@@ -21,7 +22,7 @@ class AdminSteps(BaseSteps):
         print('Создание')
         return response
 
-    def delete_user(self, user_id: int):
+    def delete_user(self, user_id: int) -> None:
         CrudRequester(
             request_spec=RequestSpecs.auth_headers(username='admin', password='123456'),
             response_spec=ResponseSpecs.request_ok(),
@@ -29,7 +30,7 @@ class AdminSteps(BaseSteps):
         ).delete(user_id)
 
 
-    def create_invalid_user(self, create_user_request: CreateUserRequest):
+    def create_invalid_user(self, create_user_request: CreateUserRequest) -> None:
         CrudRequester(
             request_spec=RequestSpecs.auth_headers(username='admin', password='123456'),
             response_spec=ResponseSpecs.request_bad(),
@@ -37,7 +38,7 @@ class AdminSteps(BaseSteps):
         ).post(create_user_request)
 
 
-    def login_user(self, login_user_request: LoginUserRequest):
+    def login_user(self, login_user_request: LoginUserRequest) -> BaseModel:
         response = ValidateCrudRequester(
             request_spec=RequestSpecs.unauth_headers(),
             response_spec=ResponseSpecs.request_ok(),

@@ -14,5 +14,5 @@ class User(Base):
 
     account = relationship("Account", backref="user", passive_deletes=True)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f'<User(id={self.id}, username={self.username}, role={self.role}, deleted_at={self.deleted_at})>'

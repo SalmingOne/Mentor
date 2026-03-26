@@ -1,6 +1,9 @@
+from typing import Iterator, Any
+
 import pytest
 
 from src.main.api.generators.model_generator import RandomModelGenerator
+from src.main.api.models.create_account_response import CreateAccountResponse
 from src.main.api.models.create_user_request import CreateUserRequest
 from mimesis import Person
 
@@ -13,7 +16,7 @@ person = Person()
 
 
 class FixtureData:
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: 'FixtureData', **kwargs: Any) -> None:
         for item in args:
             if isinstance(item, FixtureData):
                 for k,v in item.__dict__.items():
@@ -21,10 +24,10 @@ class FixtureData:
         for key, value in kwargs.items():
             setattr(self, key, value)
 
-    def __contains__(self, key):
+    def __contains__(self, key: str) -> bool:
         return key in self.__dict__
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator:
         return iter(self.__dict__.values())
 
 
@@ -64,7 +67,7 @@ def deposit_account_request(api_manager, create_account, request):
     return FixtureData(create_account, deposit_request=deposit_account_request)
 
 
-def _build_transfer_request(api_manager, create_user_request, a_response, b_response, overrides):
+def _build_transfer_request(api_manager, create_user_request: CreateUserRequest, a_response: CreateAccountResponse, b_response: CreateAccountResponse, overrides: dict[str, Any]) -> FixtureData:
     deposit_request = RandomModelGenerator.generate(DepositAccountRequest, account_id=a_response.id)
     deposit_request.amount = 9000
 

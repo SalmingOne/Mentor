@@ -8,14 +8,14 @@ from src.main.api.models.login_user_response import LoginUserResponse
 class RequestSpecs:
 
     @staticmethod
-    def base_headers():
+    def base_headers() -> dict:
         return {
             'accept': 'application/json',
             'Content-Type': 'application/json',
         }
 
     @staticmethod
-    def auth_headers(username: str, password: str):
+    def auth_headers(username: str, password: str) -> dict:
         login_user_request = LoginUserRequest(username=username, password=password)
         response = requests.post(
             url=f'{Config.fetch('urlBackend')}/auth/token/login', headers=RequestSpecs.base_headers(),
@@ -30,5 +30,5 @@ class RequestSpecs:
         raise Exception('Invalid credentials')
 
     @staticmethod
-    def unauth_headers():
+    def unauth_headers() -> dict:
         return RequestSpecs.base_headers()

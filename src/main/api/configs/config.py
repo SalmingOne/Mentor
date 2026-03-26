@@ -5,7 +5,7 @@ class Config:
     _isinstance = None
     _dict = {}
 
-    def __new__(cls, *args, **kwargs):
+    def __new__(cls, *args, **kwargs) -> 'Config':
         if cls._isinstance is None:
             cls._isinstance = super().__new__(cls)
 
@@ -20,7 +20,7 @@ class Config:
         return cls._isinstance
 
     @staticmethod
-    def fetch(key):
+    def fetch(key: str) -> str:
         return Config()._dict.get(key)
 
 
