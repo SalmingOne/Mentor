@@ -1,7 +1,11 @@
 import random
+from typing import Callable
 
 import pytest
+from sqlalchemy.orm import Session
 
+from src.main.api.classes.api_manager import ApiManager
+from src.main.api.fixtures.user_fixture import FixtureData
 from src.main.api.specs.response_specs import ResponseSpecs
 from src.main.api.db.crud.transaction_crud import TransactionCrudDb as Transaction
 from src.main.api.db.crud.credit_crud import CreditCrudDb as Credit
@@ -13,7 +17,7 @@ class TestCreditRequest:
     def user_role(self):
         return dict(role='ROLE_CREDIT_SECRET')
 
-    def test_credit_request(self, api_manager, request_credit_request, db_session):
+    def test_credit_request(self, api_manager: ApiManager, request_credit_request: FixtureData, db_session: Session):
         response = api_manager.user_steps.request_credit(request_credit_request.user_request, request_credit_request.credit_request)
 
         assert request_credit_request.credit_request.term_months == response.term_months
@@ -38,7 +42,7 @@ class TestCreditRequest:
         ({'term_months': 61}, ResponseSpecs.request_bad()),
         ({'account_id': random.randint(1, 5000)}, ResponseSpecs.request_not_found()),
     ], indirect=['request_credit_request'])
-    def test_credit_request_invalid(self, api_manager, request_credit_request, response_spec, db_session):
+    def test_credit_request_invalid(self, api_manager: ApiManager, request_credit_request: FixtureData, response_spec: Callable, db_session: Session):
 
         transaction_before = Transaction.get_transaction_by_type(db_session, 'credit_issuance')
         api_manager.user_steps.request_credit_bad(request_credit_request.user_request, request_credit_request.credit_request, response_spec=response_spec)

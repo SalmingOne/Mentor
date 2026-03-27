@@ -37,7 +37,7 @@ def user_role():
     return {}
 
 @pytest.fixture
-def create_user(api_manager, user_role, request):
+def create_user(api_manager: ApiManager, user_role, request):
     overrides = getattr(request, 'param', {})
     user_request = RandomModelGenerator.generate(CreateUserRequest, **user_role, **overrides)
     api_manager.admin_steps.create_user(user_request)
@@ -45,7 +45,7 @@ def create_user(api_manager, user_role, request):
 
 
 @pytest.fixture
-def create_account_factory(api_manager, create_user):
+def create_account_factory(api_manager: ApiManager, create_user):
     def factory():
         response = api_manager.user_steps.create_bank_account(create_user.user_request)
         return FixtureData(create_user, account_response=response)
@@ -59,7 +59,7 @@ def create_account(create_account_factory):
 
 
 @pytest.fixture
-def deposit_account_request(api_manager, create_account, request):
+def deposit_account_request(api_manager: ApiManager, create_account, request):
     overrides = dict(
         account_id=create_account.account_response.id
     ) | getattr(request, 'param', {})
@@ -67,7 +67,7 @@ def deposit_account_request(api_manager, create_account, request):
     return FixtureData(create_account, deposit_request=deposit_account_request)
 
 
-def _build_transfer_request(api_manager, create_user_request: CreateUserRequest, a_response: CreateAccountResponse, b_response: CreateAccountResponse, overrides: dict[str, Any]) -> FixtureData:
+def _build_transfer_request(api_manager: ApiManager, create_user_request: CreateUserRequest, a_response: CreateAccountResponse, b_response: CreateAccountResponse, overrides: dict[str, Any]) -> FixtureData:
     deposit_request = RandomModelGenerator.generate(DepositAccountRequest, account_id=a_response.id)
     deposit_request.amount = 9000
 
@@ -85,25 +85,25 @@ def _build_transfer_request(api_manager, create_user_request: CreateUserRequest,
 
 
 @pytest.fixture
-def transfer_same_user(api_manager, create_user, request):
+def transfer_same_user(api_manager: ApiManager, create_user, request):
     param = getattr(request, 'param', {})
     a_response = api_manager.user_steps.create_bank_account(create_user.user_request)
     if param.pop('same_account_id', False):
         b_response = a_response
     else:
         b_response = api_manager.user_steps.create_bank_account(create_user.user_request)
-    return _build_transfer_request(api_manager, create_user.user_request, a_response, b_response, param)
+    return _build_transfer_request(api_manager: ApiManager, create_user.user_request, a_response, b_response, param)
 
 @pytest.fixture
-def transfer_different_users(api_manager, create_account_factory, request):
+def transfer_different_users(api_manager: ApiManager, create_account_factory, request):
     first_factory = create_account_factory()
     second_factory = create_account_factory()
-    return _build_transfer_request(api_manager, first_factory.user_request, first_factory.account_response, second_factory.account_response, getattr(request, 'param', {}))
+    return _build_transfer_request(api_manager: ApiManager, first_factory.user_request, first_factory.account_response, second_factory.account_response, getattr(request, 'param', {}))
 
 
 
 @pytest.fixture
-def request_credit_request(api_manager, create_account, request):
+def request_credit_request(api_manager: ApiManager, create_account, request):
     create_user_request, create_account_response = create_account
     overrides = dict(
         account_id=create_account_response.id
@@ -112,7 +112,7 @@ def request_credit_request(api_manager, create_account, request):
     return FixtureData(create_account, credit_request=request_credit_request)
 
 @pytest.fixture
-def repay_credit_request(api_manager, request_credit_request, request):
+def repay_credit_request(api_manager: ApiManager, request_credit_request, request):
     credit_response = api_manager.user_steps.request_credit(request_credit_request.user_request, request_credit_request.credit_request)
 
     overrides = dict(

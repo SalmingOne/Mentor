@@ -1,8 +1,12 @@
 import random
+from typing import Callable
 
 import pytest
+from sqlalchemy.orm import Session
 
+from src.main.api.classes.api_manager import ApiManager
 from src.main.api.db.crud.transaction_crud import TransactionCrudDb as Transaction
+from src.main.api.fixtures.user_fixture import FixtureData
 from src.main.api.specs.response_specs import ResponseSpecs
 
 
@@ -12,7 +16,7 @@ class TestRepayCredit:
     def user_role(self):
         return dict(role='ROLE_CREDIT_SECRET')
 
-    def test_repay_credit(self, api_manager, repay_credit_request, db_session):
+    def test_repay_credit(self, api_manager: ApiManager, repay_credit_request: FixtureData, db_session: Session):
 
         response = api_manager.user_steps.repay_credit(repay_credit_request.user_request, repay_credit_request.repay_request)
 
@@ -30,7 +34,7 @@ class TestRepayCredit:
         ({'account_id': random.randint(1, 5000)}, ResponseSpecs.request_not_found()),
         ({'credit_id': random.randint(1, 5000)}, ResponseSpecs.request_not_found()),
     ], indirect=['repay_credit_request'])
-    def test_repay_credit_invalid(self, api_manager, repay_credit_request, response_spec, db_session):
+    def test_repay_credit_invalid(self, api_manager: ApiManager, repay_credit_request: FixtureData, response_spec: Callable, db_session: Session):
         transaction_from_db_before = Transaction.get_transaction_by_type(db_session, 'credit_repayment')
 
         api_manager.user_steps.repay_credit_bad(repay_credit_request.user_request, repay_credit_request.repay_request, response_spec)

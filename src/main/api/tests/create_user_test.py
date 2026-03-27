@@ -1,5 +1,8 @@
 import pytest
+from sqlalchemy.orm import Session
 
+from src.main.api.classes.api_manager import ApiManager
+from src.main.api.fixtures.user_fixture import FixtureData
 from src.main.api.generators.model_generator import RandomModelGenerator
 from src.main.api.models.create_user_request import CreateUserRequest
 from mimesis import Person
@@ -12,7 +15,7 @@ class TestCreateUser:
     @pytest.mark.parametrize(
         'create_user_request', [RandomModelGenerator.generate(CreateUserRequest)]
     )
-    def test_user_creation_valid(self, api_manager, create_user_request, db_session):
+    def test_user_creation_valid(self, api_manager: ApiManager, create_user_request: FixtureData, db_session: Session):
         response = api_manager.admin_steps.create_user(create_user_request)
 
         assert create_user_request.username == response.username
@@ -34,7 +37,7 @@ class TestCreateUser:
             ('qwerty', 'Password1'),
             ('qwerty', 'Password.'),
         ])
-    def test_user_creation_invalid(self, username, password, api_manager, db_session):
+    def test_user_creation_invalid(self, username, password, api_manager: ApiManager, db_session: Session):
         create_user_request = CreateUserRequest(username=username, password=password, role='ROLE_USER')
         api_manager.admin_steps.create_invalid_user(create_user_request)
 

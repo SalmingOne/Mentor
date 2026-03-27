@@ -1,7 +1,11 @@
 import random
+from typing import Callable
 
 import pytest
+from sqlalchemy.orm import Session
 
+from src.main.api.classes.api_manager import ApiManager
+from src.main.api.fixtures.user_fixture import FixtureData
 from src.main.api.generators.model_generator import RandomModelGenerator
 from src.main.api.models.deposit_account_request import DepositAccountRequest
 from src.main.api.specs.response_specs import ResponseSpecs
@@ -18,7 +22,7 @@ class TestDepositAccount:
     #
     #     assert create_account_response.balance + deposit_account_request.amount == response.balance
 
-    def test_deposit_account(self, api_manager, deposit_account_request, db_session):
+    def test_deposit_account(self, api_manager: ApiManager, deposit_account_request: FixtureData, db_session: Session):
 
         response = api_manager.user_steps.deposit_account(deposit_account_request.user_request, deposit_account_request.deposit_request)
 
@@ -34,7 +38,7 @@ class TestDepositAccount:
         ({'amount': -1}, ResponseSpecs.request_bad()),
         ({'account_id': random.randint(1, 10000)}, ResponseSpecs.request_not_found()),
     ], indirect=['deposit_account_request'])
-    def test_deposit_deposit_invalid(self, api_manager, deposit_account_request, response_spec, db_session):
+    def test_deposit_deposit_invalid(self, api_manager: ApiManager, deposit_account_request: FixtureData, response_spec: Callable, db_session: Session):
 
         transaction_from_db_before = Transaction.get_transaction_by_type(db_session, 'deposit')
         api_manager.user_steps.deposit_account_bad(deposit_account_request.user_request, deposit_account_request.deposit_request, response_spec=response_spec)
