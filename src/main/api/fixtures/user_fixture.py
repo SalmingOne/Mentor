@@ -2,6 +2,7 @@ from typing import Iterator, Any
 
 import pytest
 
+from src.main.api.classes.api_manager import ApiManager
 from src.main.api.generators.model_generator import RandomModelGenerator
 from src.main.api.models.create_account_response import CreateAccountResponse
 from src.main.api.models.create_user_request import CreateUserRequest
@@ -92,13 +93,13 @@ def transfer_same_user(api_manager: ApiManager, create_user, request):
         b_response = a_response
     else:
         b_response = api_manager.user_steps.create_bank_account(create_user.user_request)
-    return _build_transfer_request(api_manager: ApiManager, create_user.user_request, a_response, b_response, param)
+    return _build_transfer_request(api_manager, create_user.user_request, a_response, b_response, param)
 
 @pytest.fixture
 def transfer_different_users(api_manager: ApiManager, create_account_factory, request):
     first_factory = create_account_factory()
     second_factory = create_account_factory()
-    return _build_transfer_request(api_manager: ApiManager, first_factory.user_request, first_factory.account_response, second_factory.account_response, getattr(request, 'param', {}))
+    return _build_transfer_request(api_manager, first_factory.user_request, first_factory.account_response, second_factory.account_response, getattr(request, 'param', {}))
 
 
 
